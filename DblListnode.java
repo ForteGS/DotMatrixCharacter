@@ -1,5 +1,7 @@
+import java.util.Iterator;
 
-public class DblListnode<E> {
+
+public class DblListnode<E> implements Iterator<E> {
 	
 	private DblListnode<E> prev;
 	private DblListnode<E> next;
@@ -78,8 +80,5 @@ public class DblListnode<E> {
 	 */
 	public void setPrev(DblListnode<E> prev)	{
 		this.prev = prev;
-	}
-	
-	
-		
+	}	
 }

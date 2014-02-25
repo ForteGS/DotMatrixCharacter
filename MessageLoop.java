@@ -1,7 +1,7 @@
 import java.util.Iterator;
 
 
-public class MessageLoop<E> implements LoopADT<E> {
+public class MessageLoop<E> implements LoopADT<E>, Iterator<E> {
 	private DblListnode<E> msgLoop;
 	private int numItems;
 	private DblListnode<E> curr;
