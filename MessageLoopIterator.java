@@ -5,12 +5,14 @@ public class MessageLoopIterator<E> implements Iterator<E> {
 	/**
 	 * An actual pointer to traverse through the doubleListnode.
 	 */
-	DblListnode<E> tmp;
+	private DblListnode<E> tmp;
 
 	/**
 	 * A reference object which points to the first node of the double nodes.
 	 */
-	DblListnode<E> first;
+	private DblListnode<E> first;
+
+	private int counter = 0;
 
 	/**
 	 * Constructor: receive a Double List node as parameter.
@@ -28,8 +30,16 @@ public class MessageLoopIterator<E> implements Iterator<E> {
 	 * @return an object which is the data of the node.
 	 */
 	public E next() {
-		tmp = tmp.getNext();
-		return tmp.getData();
+		if (counter == 0) {
+			E data = tmp.getData();
+			counter++;
+			return data;
+		} else {
+			tmp = tmp.getNext();
+			E data = tmp.getData();
+			counter++;
+			return data;
+		}
 	}
 
 	/**
@@ -40,7 +50,7 @@ public class MessageLoopIterator<E> implements Iterator<E> {
 	 * @return True if there is available next node and false otherwise.
 	 */
 	public boolean hasNext() {
-		return !tmp.getNext().equals(first);
+		return (!tmp.getNext().equals(first) || counter == 0);
 	}
 
 	/**

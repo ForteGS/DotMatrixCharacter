@@ -49,11 +49,20 @@ public class MessageLoop<E> implements LoopADT<E> {
 	public void addBefore(E item) {
 		if (numItems == 0)
 			add(item);
-
-		DblListnode<E> newItem = new DblListnode<E>(curr.getPrev(), curr, item);
-		curr.getPrev().setNext(newItem);
-		curr.setPrev(newItem);
-		curr = newItem;
+		else if (numItems == 1) {
+			DblListnode<E> newItem = new DblListnode<E>(curr.getPrev(), curr,
+					item);
+			curr.getPrev().setNext(newItem);
+			curr.setPrev(newItem);
+			curr = newItem;
+			msgLoop = curr;
+		} else {
+			DblListnode<E> newItem = new DblListnode<E>(curr.getPrev(), curr,
+					item);
+			curr.getPrev().setNext(newItem);
+			curr.setPrev(newItem);
+			curr = newItem;
+		}
 		numItems++;
 	}
 
@@ -66,12 +75,14 @@ public class MessageLoop<E> implements LoopADT<E> {
 	public void addAfter(E item) {
 		if (numItems == 0)
 			add(item);
-
-		DblListnode<E> newItem = new DblListnode<E>(curr, curr.getNext(), item);
-		curr.getNext().setPrev(newItem);
-		curr.setNext(newItem);
-		curr = newItem;
-		numItems++;
+		else {
+			DblListnode<E> newItem = new DblListnode<E>(curr, curr.getNext(),
+					item);
+			curr.getNext().setPrev(newItem);
+			curr.setNext(newItem);
+			curr = newItem;
+			numItems++;
+		}
 	}
 
 	/**
@@ -101,7 +112,7 @@ public class MessageLoop<E> implements LoopADT<E> {
 			numItems--;
 			return tmp;
 		}
-		
+
 		curr.getPrev().setNext(curr.getNext());
 		curr.getNext().setPrev(curr.getPrev());
 		curr = curr.getNext();
