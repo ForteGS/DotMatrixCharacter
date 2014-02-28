@@ -31,7 +31,7 @@ public class MessageLoop<E> implements LoopADT<E> {
 	 * 
 	 * @param item
 	 */
-	public void add(E item) {
+	private void add(E item) {
 		msgLoop.setData(item);
 		msgLoop.setNext(msgLoop);
 		msgLoop.setPrev(msgLoop);

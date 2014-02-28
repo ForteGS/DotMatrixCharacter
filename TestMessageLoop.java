@@ -7,7 +7,7 @@ public class TestMessageLoop {
 
 		// Testing adding method
 		System.out.println("***TESTING add METHOD***");
-		msgLoop.add("Minh");
+		msgLoop.addBefore("Minh");
 		System.out.println("Expected result: Minh -->");
 		System.out.println("Result:");
 		printMessageLoop(msgLoop);
