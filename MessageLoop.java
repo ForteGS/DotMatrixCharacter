@@ -37,6 +37,7 @@ public class MessageLoop<E> implements LoopADT<E> {
 		msgLoop.setPrev(msgLoop);
 		numItems++;
 		curr = msgLoop;
+		return;
 	}
 
 	/**
@@ -53,6 +54,7 @@ public class MessageLoop<E> implements LoopADT<E> {
 		curr.getPrev().setNext(newItem);
 		curr.setPrev(newItem);
 		curr = newItem;
+		numItems++;
 	}
 
 	/**
@@ -69,6 +71,7 @@ public class MessageLoop<E> implements LoopADT<E> {
 		curr.getNext().setPrev(newItem);
 		curr.setNext(newItem);
 		curr = newItem;
+		numItems++;
 	}
 
 	/**
@@ -90,15 +93,19 @@ public class MessageLoop<E> implements LoopADT<E> {
 	 *             if the Loop is empty
 	 */
 	public E removeCurrent() {
-		if (curr == null || numItems == 0)
-			throw new EmptyLoopException();
-		if (numItems == 1)
-			msgLoop = new DblListnode<E>();
-
 		E tmp = curr.getData();
+		if (tmp == null || numItems == 0)
+			throw new EmptyLoopException();
+		if (numItems == 1) {
+			msgLoop = new DblListnode<E>();
+			numItems--;
+			return tmp;
+		}
+		
 		curr.getPrev().setNext(curr.getNext());
 		curr.getNext().setPrev(curr.getPrev());
 		curr = curr.getNext();
+		numItems--;
 		return tmp;
 	}
 
