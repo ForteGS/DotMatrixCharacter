@@ -36,6 +36,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -80,7 +81,7 @@ public class DisplayEditor {
 			String parameter = null;
 			char option = cmd.charAt(0);
 			if (cmd.length() > 1)
-				parameter = cmd.substring(1).trim();
+				parameter = cmd.substring(2);
 
 			switch (option) {
 			/**
@@ -123,7 +124,7 @@ public class DisplayEditor {
 							Iterator<List<String>> msgIter = msgLoop.iterator();
 							while (msgIter.hasNext()) {
 								List<String> item = msgIter.next();
-								out.println(printList(item));
+								out.print(printList(item));
 								out.println(special);
 							}
 
@@ -145,13 +146,41 @@ public class DisplayEditor {
 			 * correct format.
 			 */
 			case 'l': {
-				// TODO: Implement this option.
 				if (!guard(parameter)) {
 					System.out.println("invalid command");
 				} else {
+					try {
+						File input = new File(parameter);
+						Scanner fileIn = new Scanner(input);
 
+						msgLoop = new MessageLoop<List<String>>();
+						List<String> character = new ArrayList<String>();
+						
+						// For each 7 lines, we add a character, ignoring the
+						// "##########" line.
+						int count = 0;
+						while (fileIn.hasNext()) {
+							String c = fileIn.nextLine();
+							if (count < 7)	{
+								character.add(c.substring(1));
+								count++;
+							}
+							else	{
+								msgLoop.addAfter(character);
+								character = new ArrayList<String>();
+								count = 0;
+							}
+						}
+						
+						// Since we are at the last node position, we want the
+						// current item to be the first added item.
+						msgLoop.forward();
+						
+						fileIn.close();
+					} catch (FileNotFoundException e) {
+						System.out.println("unable to load");
+					}
 				}
-
 				break;
 			}
 
@@ -204,7 +233,7 @@ public class DisplayEditor {
 			 * message loop is empty, displays "no messages".
 			 */
 			case 'j': {
-				if (!guard(parameter)) 
+				if (!guard(parameter))
 					System.out.println("invalid command");
 				else if (msgLoop.size() == 0)
 					System.out.println("no messages");
@@ -280,11 +309,18 @@ public class DisplayEditor {
 					} else {
 						// TODO:Implement the case when the loop is not
 						// empty.
-						for (char c : parameter.toCharArray()) {
-							if (!dm.isValidCharacter(c + ""))
-								throw new UnrecognizedCharacterException();
-							else
-								msgLoop.addAfter(dm.getDotMatrix(c + ""));
+						try {
+							for (char c : parameter.toCharArray()) {
+								if (!dm.isValidCharacter(c + ""))
+									throw new UnrecognizedCharacterException();
+								else
+									msgLoop.addAfter(dm.getDotMatrix(c + ""));
+							}
+							displayCurrContext(msgLoop);
+						} catch (UnrecognizedCharacterException e) {
+							System.out.println("An unrecognized character "
+									+ "has been entered.");
+							break;
 						}
 					}
 				}
