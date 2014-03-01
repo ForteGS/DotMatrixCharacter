@@ -33,6 +33,9 @@
 // Credits:          null
 //////////////////////////// 80 columns wide //////////////////////////////////
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -73,7 +76,7 @@ public class DisplayEditor {
 		while (!exit) {
 			System.out.print("enter command (? for help)> ");
 			String cmd = in.nextLine().trim();
-			String parameter = cmd.substring(1);
+			String parameter = cmd.substring(1).trim();
 
 			switch (cmd.charAt(0)) {
 			/**
@@ -95,11 +98,31 @@ public class DisplayEditor {
 			 * written to, display the message.
 			 */
 			case 's': {
-				// TODO: Implement this option.
 				if (msgLoop.size() == 0)
 					System.out.println("no messages to save");
 				else {
+					try {
+						File saveFile = new File(parameter);
+						String special = printSpecialString(10, "#");
 
+						if (saveFile.exists()) {
+							System.out.println("warning: file already "
+									+ "exists, will be overwritten");
+						}
+
+						PrintWriter out = new PrintWriter(saveFile);
+
+						Iterator<List<String>> msgIter = msgLoop.iterator();
+						while (msgIter.hasNext()) {
+							List<String> item = msgIter.next();
+							out.println(printList(item));
+							out.println(special);
+						}
+
+						out.close();
+					} catch (FileNotFoundException e) {
+						System.out.println("unable to save");
+					}
 				}
 				break;
 			}
@@ -125,7 +148,17 @@ public class DisplayEditor {
 			 * must be separated from the other characters by a blank line.
 			 */
 			case 'd': {
-				// TODO: Implement this option.
+				if (msgLoop.size() == 0)
+					System.out.println("no messages");
+				else {
+					Iterator<List<String>> msgIter = msgLoop.iterator();
+
+					while (msgIter.hasNext()) {
+						List<String> item = msgIter.next();
+						System.out.println(printList(item));
+						System.out.println(printSpecialString(10, "*"));
+					}
+				}
 				break;
 			}
 
@@ -157,8 +190,18 @@ public class DisplayEditor {
 			 * message loop is empty, displays "no messages".
 			 */
 			case 'j': {
-				// TODO: Implement this option.
-				
+				String n = parameter.substring(0, 1);
+				int N = Integer.parseInt(n);
+
+				if (N >= 0) {
+					for (int i = 0; i < N; i++) {
+						msgLoop.forward();
+					}
+				} else {
+					for (int i = 0; i < Math.abs(N); i++) {
+						msgLoop.back();
+					}
+				}
 				break;
 			}
 
@@ -171,7 +214,7 @@ public class DisplayEditor {
 			case 'x': {
 				if (msgLoop.size() == 0)
 					System.out.println("no messages");
-				else	{
+				else {
 					msgLoop.removeCurrent();
 					if (msgLoop.size() == 0)
 						System.out.println("no messages");
@@ -196,21 +239,22 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'a': {
-				// TODO: Implement this option.
+				// TODO:Implement this.
 				if (msgLoop.size() == 0) {
 					try {
 						for (char c : parameter.toCharArray()) {
-							if (!dm.isValidCharacter(c + "")) {
+							if (!dm.isValidCharacter(c + ""))
 								throw new UnrecognizedCharacterException();
-							} else {
+							else
 								msgLoop.addAfter(dm.getDotMatrix(c + ""));
-							}
 						}
 					} catch (UnrecognizedCharacterException e) {
 						System.out.println("An unrecognized character "
 								+ "has been entered.");
 						break;
 					}
+				} else {
+					
 				}
 				break;
 			}
@@ -233,6 +277,22 @@ public class DisplayEditor {
 			 */
 			case 'i': {
 				// TODO: Implement this option.
+				if (msgLoop.size() == 0) {
+					try {
+						for (char c : parameter.toCharArray()) {
+							if (!dm.isValidCharacter(c + ""))
+								throw new UnrecognizedCharacterException();
+							else
+								msgLoop.addBefore(dm.getDotMatrix(c + ""));
+						}
+					} catch (UnrecognizedCharacterException e) {
+						System.out.println("An unrecognized character "
+								+ "has been entered.");
+						break;
+					}
+				} else {
+
+				}
 				break;
 			}
 
@@ -240,7 +300,11 @@ public class DisplayEditor {
 			 * Display the current context.
 			 */
 			case 'c': {
-				// TODO: Implement this option.
+				if (msgLoop.size() == 0)
+					System.out.println("no messages");
+				else
+					displayCurrContext(msgLoop);
+
 				break;
 			}
 
@@ -253,7 +317,23 @@ public class DisplayEditor {
 			 * continue with it's normal operation.
 			 */
 			case 'r': {
-				// TODO: Implement this option.
+				if (msgLoop.size() == 0)
+					System.out.println("no messages");
+				else {
+					try {
+						msgLoop.removeCurrent();
+						String c = parameter.substring(0, 1);
+						if (!dm.isValidCharacter(c))
+							throw new UnrecognizedCharacterException();
+						else
+							msgLoop.addBefore(dm.getDotMatrix(c));
+
+					} catch (UnrecognizedCharacterException e) {
+						System.out.println("An unrecognized "
+								+ "character has been entered.");
+					}
+				}
+
 				break;
 			}
 
@@ -278,11 +358,13 @@ public class DisplayEditor {
 	 * 
 	 * @param l
 	 */
-	private static void printList(List<String> l) {
+	private static String printList(List<String> l) {
 		Iterator<String> iterL = l.iterator();
+		String character = "";
 		while (iterL.hasNext()) {
-			System.out.println(iterL.next());
+			character += iterL.next();
 		}
+		return character;
 	}
 
 	/**
@@ -292,44 +374,46 @@ public class DisplayEditor {
 	 * @param msgLoop
 	 */
 	private static void displayCurrContext(LoopADT<List<String>> msgLoop) {
-		if (msgLoop.size() == 0)	
+		if (msgLoop.size() == 0)
 			System.out.println("no messages");
-		else if (msgLoop.size() == 1)	{
-			printSpecialString(10, "*");
-			printList(msgLoop.getCurrent());
-			printSpecialString(10, "*");
-		}
-		else if (msgLoop.size() == 2){
-			printSpecialString(10, "*");
-			printList(msgLoop.getCurrent());
-			printSpecialString(10, "*");
+		else if (msgLoop.size() == 1) {
+			System.out.println(printSpecialString(10, "*"));
+			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.println(printSpecialString(10, "*"));
+		} else if (msgLoop.size() == 2) {
+			System.out.println(printSpecialString(10, "*"));
+			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.println(printSpecialString(10, "*"));
 			msgLoop.forward();
-			printList(msgLoop.getCurrent());
+			System.out.println(printList(msgLoop.getCurrent()));
 			msgLoop.back();
-		} else	{
+		} else {
 			msgLoop.back();
-			printList(msgLoop.getCurrent());
+			System.out.println(printList(msgLoop.getCurrent()));
 			msgLoop.forward();
-			printSpecialString(10, "*");
-			printList(msgLoop.getCurrent());
-			printSpecialString(10, "*");
+			System.out.println(printSpecialString(10, "*"));
+			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.println(printSpecialString(10, "*"));
 			msgLoop.forward();
-			printList(msgLoop.getCurrent());
+			System.out.println(printList(msgLoop.getCurrent()));
 			msgLoop.back();
 		}
 	}
-	
+
 	/**
 	 * This function receives a string s as an object to print and an integer n
 	 * indicate how many times should it be printed.
 	 * 
-	 * @param n the number of time s should be printed
-	 * @param s the string needs to be printed
+	 * @param n
+	 *            the number of time s should be printed
+	 * @param s
+	 *            the string needs to be printed
 	 */
-	private static void printSpecialString(int n, String s){
-		for (int i = 0; i < n; i++){
-			System.out.print(s);
+	private static String printSpecialString(int n, String s) {
+		String special = "";
+		for (int i = 0; i < n; i++) {
+			special += s;
 		}
-		System.out.println();
+		return special;
 	}
 }
