@@ -75,10 +75,14 @@ public class DisplayEditor {
 
 		while (!exit) {
 			System.out.print("enter command (? for help)> ");
-			String cmd = in.nextLine().trim();
-			String parameter = cmd.substring(1).trim();
 
-			switch (cmd.charAt(0)) {
+			String cmd = in.nextLine().trim();
+			String parameter = null;
+			char option = cmd.charAt(0);
+			if (cmd.length() > 1)
+				parameter = cmd.substring(1).trim();
+
+			switch (option) {
 			/**
 			 * This option prints out the list of available commands for users.
 			 */
@@ -98,30 +102,35 @@ public class DisplayEditor {
 			 * written to, display the message.
 			 */
 			case 's': {
-				if (msgLoop.size() == 0)
-					System.out.println("no messages to save");
+				if (!guard(parameter))
+					System.out.println("invalid command");
 				else {
-					try {
-						File saveFile = new File(parameter);
-						String special = printSpecialString(10, "#");
 
-						if (saveFile.exists()) {
-							System.out.println("warning: file already "
-									+ "exists, will be overwritten");
+					if (msgLoop.size() == 0)
+						System.out.println("no messages to save");
+					else {
+						try {
+							File saveFile = new File(parameter);
+							String special = printSpecialString(10, "#");
+
+							if (saveFile.exists()) {
+								System.out.println("warning: file already "
+										+ "exists, will be overwritten");
+							}
+
+							PrintWriter out = new PrintWriter(saveFile);
+
+							Iterator<List<String>> msgIter = msgLoop.iterator();
+							while (msgIter.hasNext()) {
+								List<String> item = msgIter.next();
+								out.println(printList(item));
+								out.println(special);
+							}
+
+							out.close();
+						} catch (FileNotFoundException e) {
+							System.out.println("unable to save");
 						}
-
-						PrintWriter out = new PrintWriter(saveFile);
-
-						Iterator<List<String>> msgIter = msgLoop.iterator();
-						while (msgIter.hasNext()) {
-							List<String> item = msgIter.next();
-							out.println(printList(item));
-							out.println(special);
-						}
-
-						out.close();
-					} catch (FileNotFoundException e) {
-						System.out.println("unable to save");
 					}
 				}
 				break;
@@ -137,6 +146,12 @@ public class DisplayEditor {
 			 */
 			case 'l': {
 				// TODO: Implement this option.
+				if (!guard(parameter)) {
+					System.out.println("invalid command");
+				} else {
+
+				}
+
 				break;
 			}
 
@@ -156,7 +171,6 @@ public class DisplayEditor {
 					while (msgIter.hasNext()) {
 						List<String> item = msgIter.next();
 						System.out.println(printList(item));
-						System.out.println(printSpecialString(10, "*"));
 					}
 				}
 				break;
@@ -190,17 +204,24 @@ public class DisplayEditor {
 			 * message loop is empty, displays "no messages".
 			 */
 			case 'j': {
-				String n = parameter.substring(0, 1);
-				int N = Integer.parseInt(n);
+				if (!guard(parameter)) 
+					System.out.println("invalid command");
+				else if (msgLoop.size() == 0)
+					System.out.println("no messages");
+				else {
+					String n = parameter.substring(0);
+					int N = Integer.parseInt(n);
 
-				if (N >= 0) {
-					for (int i = 0; i < N; i++) {
-						msgLoop.forward();
+					if (N >= 0) {
+						for (int i = 0; i < N; i++) {
+							msgLoop.forward();
+						}
+					} else {
+						for (int i = 0; i < Math.abs(N); i++) {
+							msgLoop.back();
+						}
 					}
-				} else {
-					for (int i = 0; i < Math.abs(N); i++) {
-						msgLoop.back();
-					}
+					displayCurrContext(msgLoop);
 				}
 				break;
 			}
@@ -239,22 +260,33 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'a': {
-				// TODO:Implement this.
-				if (msgLoop.size() == 0) {
-					try {
+				if (!guard(parameter)) {
+					System.out.println("invalid command");
+				} else {
+					if (msgLoop.size() == 0) {
+						try {
+							for (char c : parameter.toCharArray()) {
+								if (!dm.isValidCharacter(c + ""))
+									throw new UnrecognizedCharacterException();
+								else
+									msgLoop.addAfter(dm.getDotMatrix(c + ""));
+							}
+							displayCurrContext(msgLoop);
+						} catch (UnrecognizedCharacterException e) {
+							System.out.println("An unrecognized character "
+									+ "has been entered.");
+							break;
+						}
+					} else {
+						// TODO:Implement the case when the loop is not
+						// empty.
 						for (char c : parameter.toCharArray()) {
 							if (!dm.isValidCharacter(c + ""))
 								throw new UnrecognizedCharacterException();
 							else
 								msgLoop.addAfter(dm.getDotMatrix(c + ""));
 						}
-					} catch (UnrecognizedCharacterException e) {
-						System.out.println("An unrecognized character "
-								+ "has been entered.");
-						break;
 					}
-				} else {
-					
 				}
 				break;
 			}
@@ -276,22 +308,37 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'i': {
-				// TODO: Implement this option.
-				if (msgLoop.size() == 0) {
-					try {
-						for (char c : parameter.toCharArray()) {
-							if (!dm.isValidCharacter(c + ""))
-								throw new UnrecognizedCharacterException();
-							else
-								msgLoop.addBefore(dm.getDotMatrix(c + ""));
-						}
-					} catch (UnrecognizedCharacterException e) {
-						System.out.println("An unrecognized character "
-								+ "has been entered.");
-						break;
-					}
+				if (!guard(parameter)) {
+					System.out.println("invalid command");
 				} else {
-
+					if (msgLoop.size() == 0) {
+						try {
+							for (char c : parameter.toCharArray()) {
+								if (!dm.isValidCharacter(c + ""))
+									throw new UnrecognizedCharacterException();
+								else
+									msgLoop.addBefore(dm.getDotMatrix(c + ""));
+							}
+						} catch (UnrecognizedCharacterException e) {
+							System.out.println("An unrecognized character "
+									+ "has been entered.");
+							break;
+						}
+					} else {
+						// TODO:Implement the case when the loop is not
+						// empty.
+						try {
+							for (char c : parameter.toCharArray()) {
+								if (!dm.isValidCharacter(c + ""))
+									throw new UnrecognizedCharacterException();
+								else
+									msgLoop.addBefore(dm.getDotMatrix(c + ""));
+							}
+						} catch (UnrecognizedCharacterException e) {
+							System.out.println("An unrecognized character "
+									+ "has been entered.");
+						}
+					}
 				}
 				break;
 			}
@@ -317,23 +364,27 @@ public class DisplayEditor {
 			 * continue with it's normal operation.
 			 */
 			case 'r': {
-				if (msgLoop.size() == 0)
-					System.out.println("no messages");
-				else {
-					try {
-						msgLoop.removeCurrent();
-						String c = parameter.substring(0, 1);
-						if (!dm.isValidCharacter(c))
-							throw new UnrecognizedCharacterException();
-						else
-							msgLoop.addBefore(dm.getDotMatrix(c));
+				if (!guard(parameter)) {
+					System.out.println("invalid command");
 
-					} catch (UnrecognizedCharacterException e) {
-						System.out.println("An unrecognized "
-								+ "character has been entered.");
+				} else {
+					if (msgLoop.size() == 0)
+						System.out.println("no messages");
+					else {
+						try {
+							msgLoop.removeCurrent();
+							String c = parameter.substring(0, 1);
+							if (!dm.isValidCharacter(c))
+								throw new UnrecognizedCharacterException();
+							else
+								msgLoop.addBefore(dm.getDotMatrix(c));
+
+						} catch (UnrecognizedCharacterException e) {
+							System.out.println("An unrecognized "
+									+ "character has been entered.");
+						}
 					}
 				}
-
 				break;
 			}
 
@@ -350,6 +401,7 @@ public class DisplayEditor {
 				break;
 			}
 		}
+
 		in.close();
 	}
 
@@ -362,7 +414,8 @@ public class DisplayEditor {
 		Iterator<String> iterL = l.iterator();
 		String character = "";
 		while (iterL.hasNext()) {
-			character += iterL.next();
+			String item = iterL.next() + "\n";
+			character += item;
 		}
 		return character;
 	}
@@ -378,24 +431,24 @@ public class DisplayEditor {
 			System.out.println("no messages");
 		else if (msgLoop.size() == 1) {
 			System.out.println(printSpecialString(10, "*"));
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			System.out.println(printSpecialString(10, "*"));
 		} else if (msgLoop.size() == 2) {
 			System.out.println(printSpecialString(10, "*"));
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			System.out.println(printSpecialString(10, "*"));
 			msgLoop.forward();
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			msgLoop.back();
 		} else {
 			msgLoop.back();
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			msgLoop.forward();
 			System.out.println(printSpecialString(10, "*"));
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			System.out.println(printSpecialString(10, "*"));
 			msgLoop.forward();
-			System.out.println(printList(msgLoop.getCurrent()));
+			System.out.print(printList(msgLoop.getCurrent()));
 			msgLoop.back();
 		}
 	}
@@ -415,5 +468,18 @@ public class DisplayEditor {
 			special += s;
 		}
 		return special;
+	}
+
+	/**
+	 * Return false if parameter is null.
+	 * 
+	 * @param parameter
+	 * @return
+	 */
+	private static <E> boolean guard(E parameter) {
+		if (parameter == null)
+			return false;
+		else
+			return true;
 	}
 }
