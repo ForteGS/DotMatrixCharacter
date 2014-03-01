@@ -67,12 +67,45 @@ public class DisplayEditor {
 		 */
 		LoopADT<List<String>> msgLoop = new MessageLoop<List<String>>();
 
-		// String s = "h";
+		if (args.length == 1 || args.length > 2) {
+			System.err.println("invalid command-line arguments");
+			System.exit(1);
+		}
 
+		if (args.length == 0) {
+			System.out.print("Enter the dot-matrix alphabets file:");
+			alphabet = in.next();
+			in.nextLine();
+		}
+		/**
+		 * Code forked from CS367 page. Create a scanner of the file named as
+		 * the first given argument. If fail to open file, switch scanner to the
+		 * input stream.
+		 * 
+		 * @author: CS367 TAs
+		 */
+		boolean useFile = args.length == 2;
+		if (useFile) {
+			File inFile = new File(args[0]);
+			alphabet = args[1];
+			if (!inFile.exists() || !inFile.canRead()) {
+				System.err.println("Problem with input file!");
+				System.exit(1);
+			}
+			try {
+				in = new Scanner(inFile);
+			} catch (FileNotFoundException e) {
+				System.err.println("Problem with input file!");
+				System.exit(1);
+			}
+		} else
+			;
+
+		/**
+		 * Load up the dot matrix tree map for each character in the alphabet.
+		 */
 		DotMatrix dm = new DotMatrix();
 		dm.loadAlphabets(alphabet);
-
-		// printList(dm.getDotMatrix(s));
 
 		while (!exit) {
 			System.out.print("enter command (? for help)> ");
@@ -80,10 +113,15 @@ public class DisplayEditor {
 			String cmd = in.nextLine().trim();
 			String parameter = null;
 			char option = cmd.charAt(0);
+
+			/**
+			 * Some options require arguments
+			 */
 			if (cmd.length() > 1)
 				parameter = cmd.substring(2);
 
 			switch (option) {
+
 			/**
 			 * This option prints out the list of available commands for users.
 			 */
@@ -155,27 +193,26 @@ public class DisplayEditor {
 
 						msgLoop = new MessageLoop<List<String>>();
 						List<String> character = new ArrayList<String>();
-						
+
 						// For each 7 lines, we add a character, ignoring the
 						// "##########" line.
 						int count = 0;
 						while (fileIn.hasNext()) {
 							String c = fileIn.nextLine();
-							if (count < 7)	{
+							if (count < 7) {
 								character.add(c.substring(1));
 								count++;
-							}
-							else	{
+							} else {
 								msgLoop.addAfter(character);
 								character = new ArrayList<String>();
 								count = 0;
 							}
 						}
-						
+
 						// Since we are at the last node position, we want the
 						// current item to be the first added item.
 						msgLoop.forward();
-						
+
 						fileIn.close();
 					} catch (FileNotFoundException e) {
 						System.out.println("unable to load");
@@ -239,22 +276,27 @@ public class DisplayEditor {
 					System.out.println("no messages");
 				else {
 					String n = parameter.substring(0);
-					int N = Integer.parseInt(n);
 
-					if (N >= 0) {
-						for (int i = 0; i < N; i++) {
-							msgLoop.forward();
+					try {
+						int N = Integer.parseInt(n);
+						if (N >= 0) {
+							for (int i = 0; i < N; i++) {
+								msgLoop.forward();
+							}
+						} else {
+							for (int i = 0; i < Math.abs(N); i++) {
+								msgLoop.back();
+							}
 						}
-					} else {
-						for (int i = 0; i < Math.abs(N); i++) {
-							msgLoop.back();
-						}
+						displayCurrContext(msgLoop);
+						break;
+					} catch (Exception e) {
+						System.out.println("invalid command");
+						break;
 					}
-					displayCurrContext(msgLoop);
-				}
-				break;
-			}
 
+				}
+			}
 			/**
 			 * Deletes the current character in the message. If the message loop
 			 * becomes empty as a result of the removal, display "no messages".
