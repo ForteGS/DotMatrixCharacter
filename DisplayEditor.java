@@ -33,11 +33,13 @@
 // Credits:          null
 //////////////////////////// 80 columns wide //////////////////////////////////
 
-
+import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 /**
  * This class is the main class which prompts the users' input.
+ * 
  * @author Minh Bui
  */
 
@@ -50,6 +52,23 @@ public class DisplayEditor {
 		 * When exit is true, the program will terminate.
 		 */
 		boolean exit = false;
+
+		/**
+		 * The file name of the alphabet.
+		 */
+		String alphabet = "alphabets.txt";
+
+		/**
+		 * Create an empty Loop of characters.
+		 */
+		LoopADT<List<String>> msgLoop = new MessageLoop<List<String>>();
+
+		// String s = "h";
+
+		DotMatrix dm = new DotMatrix();
+		dm.loadAlphabets(alphabet);
+
+		// printList(dm.getDotMatrix(s));
 
 		while (!exit) {
 			System.out.print("enter command (? for help)> ");
@@ -76,7 +95,12 @@ public class DisplayEditor {
 			 * written to, display the message.
 			 */
 			case 's': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
+				if (msgLoop.size() == 0)
+					System.out.println("no messages to save");
+				else {
+
+				}
 				break;
 			}
 
@@ -89,7 +113,7 @@ public class DisplayEditor {
 			 * correct format.
 			 */
 			case 'l': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
 				break;
 			}
 
@@ -101,7 +125,7 @@ public class DisplayEditor {
 			 * must be separated from the other characters by a blank line.
 			 */
 			case 'd': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
 				break;
 			}
 
@@ -111,7 +135,8 @@ public class DisplayEditor {
 			 * display "no messages".
 			 */
 			case 'n': {
-				//TODO: Implement this option.
+				msgLoop.forward();
+				displayCurrContext(msgLoop);
 				break;
 			}
 
@@ -121,7 +146,8 @@ public class DisplayEditor {
 			 * displays "no messages".
 			 */
 			case 'p': {
-				//TODO: Implement this option.
+				msgLoop.back();
+				displayCurrContext(msgLoop);
 				break;
 			}
 
@@ -131,7 +157,8 @@ public class DisplayEditor {
 			 * message loop is empty, displays "no messages".
 			 */
 			case 'j': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
+				
 				break;
 			}
 
@@ -142,7 +169,13 @@ public class DisplayEditor {
 			 * current character and displays the current context.
 			 */
 			case 'x': {
-				//TODO: Implement this option.
+				if (msgLoop.size() == 0)
+					System.out.println("no messages");
+				else	{
+					msgLoop.removeCurrent();
+					if (msgLoop.size() == 0)
+						System.out.println("no messages");
+				}
 				break;
 			}
 
@@ -163,7 +196,22 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'a': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
+				if (msgLoop.size() == 0) {
+					try {
+						for (char c : parameter.toCharArray()) {
+							if (!dm.isValidCharacter(c + "")) {
+								throw new UnrecognizedCharacterException();
+							} else {
+								msgLoop.addAfter(dm.getDotMatrix(c + ""));
+							}
+						}
+					} catch (UnrecognizedCharacterException e) {
+						System.out.println("An unrecognized character "
+								+ "has been entered.");
+						break;
+					}
+				}
 				break;
 			}
 
@@ -184,7 +232,7 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'i': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
 				break;
 			}
 
@@ -192,7 +240,7 @@ public class DisplayEditor {
 			 * Display the current context.
 			 */
 			case 'c': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
 				break;
 			}
 
@@ -205,10 +253,10 @@ public class DisplayEditor {
 			 * continue with it's normal operation.
 			 */
 			case 'r': {
-				//TODO: Implement this option.
+				// TODO: Implement this option.
 				break;
 			}
-			
+
 			/**
 			 * Display "quit" and quit the program.
 			 */
@@ -223,5 +271,65 @@ public class DisplayEditor {
 			}
 		}
 		in.close();
+	}
+
+	/**
+	 * This function prints out the elements in a list of strings.
+	 * 
+	 * @param l
+	 */
+	private static void printList(List<String> l) {
+		Iterator<String> iterL = l.iterator();
+		while (iterL.hasNext()) {
+			System.out.println(iterL.next());
+		}
+	}
+
+	/**
+	 * This function receives a message loop object and prints out the current
+	 * context of that message loop object.
+	 * 
+	 * @param msgLoop
+	 */
+	private static void displayCurrContext(LoopADT<List<String>> msgLoop) {
+		if (msgLoop.size() == 0)	
+			System.out.println("no messages");
+		else if (msgLoop.size() == 1)	{
+			printSpecialString(10, "*");
+			printList(msgLoop.getCurrent());
+			printSpecialString(10, "*");
+		}
+		else if (msgLoop.size() == 2){
+			printSpecialString(10, "*");
+			printList(msgLoop.getCurrent());
+			printSpecialString(10, "*");
+			msgLoop.forward();
+			printList(msgLoop.getCurrent());
+			msgLoop.back();
+		} else	{
+			msgLoop.back();
+			printList(msgLoop.getCurrent());
+			msgLoop.forward();
+			printSpecialString(10, "*");
+			printList(msgLoop.getCurrent());
+			printSpecialString(10, "*");
+			msgLoop.forward();
+			printList(msgLoop.getCurrent());
+			msgLoop.back();
+		}
+	}
+	
+	/**
+	 * This function receives a string s as an object to print and an integer n
+	 * indicate how many times should it be printed.
+	 * 
+	 * @param n the number of time s should be printed
+	 * @param s the string needs to be printed
+	 */
+	private static void printSpecialString(int n, String s){
+		for (int i = 0; i < n; i++){
+			System.out.print(s);
+		}
+		System.out.println();
 	}
 }

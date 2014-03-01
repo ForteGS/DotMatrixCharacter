@@ -35,4 +35,8 @@ public class UnrecognizedCharacterException extends RuntimeException {
 	public UnrecognizedCharacterException() {
 		super();
 	}
+	
+	public UnrecognizedCharacterException(String s)		{
+		super(s);
+	}
 }
