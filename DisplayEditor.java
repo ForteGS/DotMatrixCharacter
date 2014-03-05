@@ -110,7 +110,7 @@ public class DisplayEditor {
 		while (!exit) {
 			System.out.print("enter command (? for help)> ");
 
-			String cmd = in.nextLine().trim();
+			String cmd = in.nextLine();
 			String parameter = null;
 			char option = cmd.charAt(0);
 
@@ -203,7 +203,7 @@ public class DisplayEditor {
 						while (fileIn.hasNext()) {
 							String c = fileIn.nextLine();
 							if (count < 7) {
-								character.add(c.substring(1));
+								character.add(c.substring(0));
 								count++;
 							} else {
 								msgLoop.addAfter(character);
@@ -312,15 +312,11 @@ public class DisplayEditor {
 					break;
 
 				} else {
-					if (msgLoop.size() == 0)
-						System.out.println("no messages");
-					else {
+					if (msgLoop.size() != 0)
 						msgLoop.removeCurrent();
-
-					}
-					displayCurrContext(msgLoop);
-					break;
 				}
+				displayCurrContext(msgLoop);
+				break;
 			}
 
 			/**
@@ -343,37 +339,23 @@ public class DisplayEditor {
 				if (!guard(parameter)) {
 					System.out.println("invalid command");
 				} else {
-					if (msgLoop.size() == 0) {
-						try {
-							for (char c : parameter.toCharArray()) {
-								if (!dm.isValidCharacter(c + ""))
-									throw new UnrecognizedCharacterException();
-								else
-									msgLoop.addAfter(dm.getDotMatrix(c + ""));
-							}
-							displayCurrContext(msgLoop);
-						} catch (UnrecognizedCharacterException e) {
-							System.out.println("An unrecognized character "
-									+ "has been entered.");
-							break;
+
+					try {
+						for (char c : parameter.toCharArray()) {
+							if (!dm.isValidCharacter(c + ""))
+								throw new UnrecognizedCharacterException();
 						}
-					} else {
-						// TODO:Implement the case when the loop is not
-						// empty.
-						try {
-							for (char c : parameter.toCharArray()) {
-								if (!dm.isValidCharacter(c + ""))
-									throw new UnrecognizedCharacterException();
-								else
-									msgLoop.addAfter(dm.getDotMatrix(c + ""));
-							}
-							displayCurrContext(msgLoop);
-						} catch (UnrecognizedCharacterException e) {
-							System.out.println("An unrecognized character "
-									+ "has been entered.");
-							break;
+
+						for (char c : parameter.toCharArray()) {
+							msgLoop.addAfter(dm.getDotMatrix(c + ""));
 						}
+						displayCurrContext(msgLoop);
+					} catch (UnrecognizedCharacterException e) {
+						System.out.println("An unrecognized character "
+								+ "has been entered.");
+						break;
 					}
+
 				}
 				break;
 			}
@@ -398,36 +380,22 @@ public class DisplayEditor {
 				if (!guard(parameter)) {
 					System.out.println("invalid command");
 				} else {
-					if (msgLoop.size() == 0) {
-						try {
-							for (char c : parameter.toCharArray()) {
-								if (!dm.isValidCharacter(c + ""))
-									throw new UnrecognizedCharacterException();
-								else
-									msgLoop.addBefore(dm.getDotMatrix(c + ""));
-							}
-							displayCurrContext(msgLoop);
-						} catch (UnrecognizedCharacterException e) {
-							System.out.println("An unrecognized character "
-									+ "has been entered.");
-							break;
+					try {
+						for (char c : parameter.toCharArray()) {
+							if (!dm.isValidCharacter(c + ""))
+								throw new UnrecognizedCharacterException();
 						}
-					} else {
-						// TODO:Implement the case when the loop is not
-						// empty.
-						try {
-							for (char c : parameter.toCharArray()) {
-								if (!dm.isValidCharacter(c + ""))
-									throw new UnrecognizedCharacterException();
-								else
-									msgLoop.addBefore(dm.getDotMatrix(c + ""));
-							}
-							displayCurrContext(msgLoop);
-						} catch (UnrecognizedCharacterException e) {
-							System.out.println("An unrecognized character "
-									+ "has been entered.");
+
+						for (char c : parameter.toCharArray()) {
+							msgLoop.addBefore(dm.getDotMatrix(c + ""));
 						}
+						displayCurrContext(msgLoop);
+					} catch (UnrecognizedCharacterException e) {
+						System.out.println("An unrecognized character "
+								+ "has been entered.");
+						break;
 					}
+
 				}
 				break;
 			}
@@ -483,7 +451,7 @@ public class DisplayEditor {
 			case 'q': {
 				exit = true;
 				in.close();
-				System.out.print("quit");
+				System.out.println("quit");
 				break;
 			}
 			default:
@@ -565,9 +533,6 @@ public class DisplayEditor {
 	 * @return
 	 */
 	private static <E> boolean guard(E parameter) {
-		if (parameter == null)
-			return false;
-		else
-			return true;
+		return !(parameter == null);
 	}
 }
