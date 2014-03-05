@@ -27,8 +27,9 @@ import java.util.Iterator;
 
 /**
  * An Iterator for the MessageLoop data structure.
+ * 
  * @author Minh Bui
- *
+ * 
  * @param <E>
  */
 public class MessageLoopIterator<E> implements Iterator<E> {
@@ -61,16 +62,15 @@ public class MessageLoopIterator<E> implements Iterator<E> {
 	 * @return an object which is the data of the node.
 	 */
 	public E next() {
+		E data;
 		if (counter == 0) {
-			E data = tmp.getData();
-			counter++;
-			return data;
+			data = tmp.getData();
 		} else {
 			tmp = tmp.getNext();
-			E data = tmp.getData();
-			counter++;
-			return data;
+			data = tmp.getData();
 		}
+		counter++;
+		return data;
 	}
 
 	/**

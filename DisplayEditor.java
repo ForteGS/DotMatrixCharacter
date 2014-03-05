@@ -197,11 +197,12 @@ public class DisplayEditor {
 						msgLoop = new MessageLoop<List<String>>();
 						List<String> character = new ArrayList<String>();
 
-						// For each 7 lines, we add a character, ignoring the
+						// For each 7 lines, add a character, ignoring the
 						// "##########" line.
 						int count = 0;
 						while (fileIn.hasNext()) {
 							String c = fileIn.nextLine();
+							// The dot matrix size for each character is 7 x 5.
 							if (count < 7) {
 								character.add(c.substring(0));
 								count++;
@@ -283,20 +284,16 @@ public class DisplayEditor {
 					try {
 						int N = Integer.parseInt(n);
 						if (N >= 0) {
-							for (int i = 0; i < N; i++) {
+							for (int i = 0; i < N; i++)
 								msgLoop.forward();
-							}
 						} else {
-							for (int i = 0; i < Math.abs(N); i++) {
+							for (int i = 0; i < Math.abs(N); i++)
 								msgLoop.back();
-							}
 						}
 						displayCurrContext(msgLoop);
-						break;
 					} catch (Exception e) {
 						System.out.println("invalid command");
 					}
-
 				}
 				break;
 			}
@@ -310,7 +307,6 @@ public class DisplayEditor {
 				if (parameter != null) {
 					System.out.println("invalid command");
 					break;
-
 				} else {
 					if (msgLoop.size() != 0)
 						msgLoop.removeCurrent();
@@ -339,23 +335,21 @@ public class DisplayEditor {
 				if (!guard(parameter)) {
 					System.out.println("invalid command");
 				} else {
-
 					try {
 						for (char c : parameter.toCharArray()) {
 							if (!dm.isValidCharacter(c + ""))
 								throw new UnrecognizedCharacterException();
 						}
 
-						for (char c : parameter.toCharArray()) {
+						for (char c : parameter.toCharArray()) 
 							msgLoop.addAfter(dm.getDotMatrix(c + ""));
-						}
+
 						displayCurrContext(msgLoop);
 					} catch (UnrecognizedCharacterException e) {
 						System.out.println("An unrecognized character "
 								+ "has been entered.");
 						break;
 					}
-
 				}
 				break;
 			}
@@ -386,16 +380,15 @@ public class DisplayEditor {
 								throw new UnrecognizedCharacterException();
 						}
 
-						for (char c : parameter.toCharArray()) {
+						for (char c : parameter.toCharArray()) 
 							msgLoop.addBefore(dm.getDotMatrix(c + ""));
-						}
+						
 						displayCurrContext(msgLoop);
 					} catch (UnrecognizedCharacterException e) {
 						System.out.println("An unrecognized character "
 								+ "has been entered.");
 						break;
 					}
-
 				}
 				break;
 			}
@@ -408,7 +401,6 @@ public class DisplayEditor {
 					System.out.println("no messages");
 				else
 					displayCurrContext(msgLoop);
-
 				break;
 			}
 
