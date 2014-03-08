@@ -117,12 +117,13 @@ public class DisplayEditor {
 			/**
 			 * Some options require arguments
 			 */
-			if (cmd.length() > 1)
+			if (cmd.length() >= 3)
 				parameter = cmd.substring(2);
 
 			if (args.length == 2) {
 				System.out.println(cmd);
 			}
+			
 			switch (option) {
 
 			/**
@@ -144,7 +145,7 @@ public class DisplayEditor {
 			 * written to, display the message.
 			 */
 			case 's': {
-				if (!guard(parameter))
+				if (isNull(parameter))
 					System.out.println("invalid command");
 				else {
 
@@ -187,7 +188,7 @@ public class DisplayEditor {
 			 * correct format.
 			 */
 			case 'l': {
-				if (!guard(parameter)) {
+				if (isNull(parameter)) {
 					System.out.println("invalid command");
 				} else {
 					try {
@@ -274,7 +275,7 @@ public class DisplayEditor {
 			 * message loop is empty, displays "no messages".
 			 */
 			case 'j': {
-				if (!guard(parameter))
+				if (isNull(parameter))
 					System.out.println("invalid command");
 				else if (msgLoop.size() == 0)
 					System.out.println("no messages");
@@ -304,7 +305,7 @@ public class DisplayEditor {
 			 * current character and displays the current context.
 			 */
 			case 'x': {
-				if (parameter != null) {
+				if (!isNull(parameter)) {
 					System.out.println("invalid command");
 					break;
 				} else {
@@ -332,7 +333,7 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'a': {
-				if (!guard(parameter)) {
+				if (isNull(parameter)) {
 					System.out.println("invalid command");
 				} else {
 					try {
@@ -341,7 +342,7 @@ public class DisplayEditor {
 								throw new UnrecognizedCharacterException();
 						}
 
-						for (char c : parameter.toCharArray()) 
+						for (char c : parameter.toCharArray())
 							msgLoop.addAfter(dm.getDotMatrix(c + ""));
 
 						displayCurrContext(msgLoop);
@@ -371,7 +372,7 @@ public class DisplayEditor {
 			 * mapping file alphabets.txt
 			 */
 			case 'i': {
-				if (!guard(parameter)) {
+				if (isNull(parameter)) {
 					System.out.println("invalid command");
 				} else {
 					try {
@@ -380,9 +381,9 @@ public class DisplayEditor {
 								throw new UnrecognizedCharacterException();
 						}
 
-						for (char c : parameter.toCharArray()) 
+						for (char c : parameter.toCharArray())
 							msgLoop.addBefore(dm.getDotMatrix(c + ""));
-						
+
 						displayCurrContext(msgLoop);
 					} catch (UnrecognizedCharacterException e) {
 						System.out.println("An unrecognized character "
@@ -413,7 +414,7 @@ public class DisplayEditor {
 			 * continue with it's normal operation.
 			 */
 			case 'r': {
-				if (!guard(parameter) || parameter.length() > 1) {
+				if (isNull(parameter) || parameter.length() > 1) {
 					System.out.println("invalid command");
 
 				} else {
@@ -524,7 +525,7 @@ public class DisplayEditor {
 	 * @param parameter
 	 * @return
 	 */
-	private static <E> boolean guard(E parameter) {
-		return !(parameter == null);
+	private static <E> boolean isNull(E parameter) {
+		return (parameter == null);
 	}
 }
