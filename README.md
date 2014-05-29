@@ -1,3 +1,7 @@
+For more information about DotMatrix: http://en.wikipedia.org/wiki/Dot_matrix
+
+This program simulates the process of creating a dot matrix generator.
+
 The program will receive these option as commands:
 
 s (save)    l (load)       d (display)
